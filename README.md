@@ -17,8 +17,9 @@ Planned things for v0.1 release:
 * Replace the Side Scroller Camera with a Component
 * Establish naming conventions for c++ files
 * Implement automated Testing
+* Create a Wiki
 
-Ongoing: Update Example Map with implemented features
+Ongoing: Update Example Map and Wiki with implemented features
 
 ## Adding The Plugin
 
