@@ -73,3 +73,12 @@ Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Cache files for the editor to use
+DerivedDataCache/*
+Source/SideScroller/Binaries/
+Source/SideScroller/Intermediate/
+Source/SideScroller/Saved/
+Source/SideScroller/Plugins/SideScrollerCameraPlugin/Binaries/
+Source/SideScroller/Plugins/SideScrollerCameraPlugin/Intermediate/
+Source/SideScroller/DerivedDataCache/
