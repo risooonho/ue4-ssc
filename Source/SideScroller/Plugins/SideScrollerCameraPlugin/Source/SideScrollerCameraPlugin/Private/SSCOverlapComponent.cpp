@@ -3,7 +3,7 @@
 #include "SSCOverlapComponent.h"
 #include "SideScrollerPrivatePCH.h"
 
-#include "SideScrollerCamera.h"
+//#include "SideScrollerCamera.h"
 
 // Sets default values for this component's properties
 USSCOverlapComponent::USSCOverlapComponent()
