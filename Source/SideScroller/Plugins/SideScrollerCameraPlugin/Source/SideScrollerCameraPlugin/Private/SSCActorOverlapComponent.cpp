@@ -55,6 +55,9 @@ void USSCActorOverlapComponent::BeginOverlap(UPrimitiveComponent* OverlappedComp
 
 	if (SSCOverlapComponents.Num() > 0)
 	{
+		UE_LOG(SSCLog, Log, TEXT("Actor begins overlapping with %s"), *OtherActor->GetName() );
 
+		// Notify listeners
+		OnActorOverlapWithSSCOverlapComponent.Broadcast(OtherActor, this->GetOwner());
 	}
 }

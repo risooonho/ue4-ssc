@@ -89,4 +89,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 	bool bMinZ;
+
+	FDelegateHandle MyDelegateHandle;
 };

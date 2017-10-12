@@ -10,6 +10,8 @@
 
 #include "SSCActorOverlapComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSSCActorOverlapComponentBeginOverlapSignature, AActor*, SSCOverlapActor, AActor*, SideScrollerFollowActor);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SIDESCROLLERCAMERAPLUGIN_API USSCActorOverlapComponent : public UActorComponent
 {
@@ -28,7 +30,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	/* Create BoxComponent to check for SSCOverlapComponents*/
+	UPROPERTY(BlueprintAssignable, Category = "SideScroller")
 	UBoxComponent *BoxComponent;
+
+	/* Event when OverlapComponent begins Overlap with SideScrollerFollowComponent */
+	UPROPERTY(BlueprintAssignable, Category = "SideScroller")
+	FSSCActorOverlapComponentBeginOverlapSignature OnActorOverlapWithSSCOverlapComponent;
 
 	UFUNCTION()
 		void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
