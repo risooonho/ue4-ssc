@@ -4,8 +4,12 @@
 
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "GameFramework/GameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "SideScrollerFollowComponent.h"
+#include "SSCActorOverlapComponent.h"
+#include "SSCGameMode.h"
 
 
 // Sets default values for this component's properties
@@ -32,6 +36,19 @@ void USSCCameraComponent::BeginPlay()
 	ProtectedCameraArm = DefaultCameraArm;
 	ProtectedFollowCharZ = bDefaultFollowCharZ;
 
+	UWorld* TheWorld = GetWorld();
+	if (TheWorld != nullptr)
+	{
+		AGameModeBase* GameMode = UGameplayStatics::GetGameMode(TheWorld);
+		ASSCGameMode* SSCGameMode = Cast<ASSCGameMode>(GameMode);
+		if (SSCGameMode != nullptr)
+		{
+			SSCGameMode->UpdateCameraDelegate.AddDynamic(this, &USSCCameraComponent::UpdateCameraParameters);
+		}
+		
+	}
+	
+
 	// Get all actors to follow
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -51,7 +68,7 @@ void USSCCameraComponent::BeginPlay()
 		if (SSCOverlapComponents.Num() > 0)
 		{
 			auto SSCOverlapComponent = Cast<USSCOverlapComponent>(SSCOverlapComponents[0]);
-			SSCOverlapComponent->OnOverlapWithOverlapComponent.AddDynamic(this, &USSCCameraComponent::UpdateCameraParameters);
+			//SSCOverlapComponent->OnOverlapWithOverlapComponent.AddDynamic(this, &USSCCameraComponent::UpdateCameraParameters);
 		}
 	}
 	
@@ -101,6 +118,8 @@ void USSCCameraComponent::UpdateCameraParameters(FVector TargetLocation, float A
 	ProtectedTargetLocation = TargetLocation;
 	ProtectedCameraArm = Armlength;
 	ProtectedFollowCharZ = FollowCharZ;
+
+	UE_LOG(SSCLog, Log, TEXT("SSCCamera Updated"));
 }
 
 FVector USSCCameraComponent::GetActorsLocation()
@@ -123,4 +142,9 @@ FVector USSCCameraComponent::GetActorsLocation()
 	ActorsToFollowLocation = ActorsLocation;
 
 	return ActorsToFollowLocation;
+}
+
+void USSCCameraComponent::Testfunction()
+{
+	//
 }

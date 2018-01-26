@@ -3,8 +3,6 @@
 #include "SSCActorOverlapComponent.h"
 #include "SideScrollerPrivatePCH.h"
 
-#include "SSCCameraComponent.h"
-
 #include "SSCOverlapComponent.h"
 
 
@@ -15,13 +13,6 @@ USSCActorOverlapComponent::USSCActorOverlapComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	/* Spawn CollisionBox for SSCOverlapComponentCheck and attach to root*/
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
-	if (BoxComponent->GetOwner() != nullptr)
-	{
-		BoxComponent->SetupAttachment(GetOwner()->GetRootComponent());
-		BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &USSCActorOverlapComponent::BeginOverlap);
-	}
 }
 
 
@@ -43,21 +34,19 @@ void USSCActorOverlapComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
+// Check for overlap with SSCOverlapComponents
 void USSCActorOverlapComponent::BeginOverlap(UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex,
 	bool bFromSweep,
-	const FHitResult &SweepResult)
+	const FHitResult &SweepResult) //Kann man das nicht auch spezifisch für SSCOverlapComponents machen und dies nicht erst später abfragen?
 {
-	TArray<USSCOverlapComponent*> SSCOverlapComponents;
+	/*TArray<USSCOverlapComponent*> SSCOverlapComponents;
 	OtherActor->GetComponents(SSCOverlapComponents);
 
 	if (SSCOverlapComponents.Num() > 0)
 	{
 		UE_LOG(SSCLog, Log, TEXT("Actor begins overlapping with %s"), *OtherActor->GetName() );
-
-		// Notify listeners
-		OnActorOverlapWithSSCOverlapComponent.Broadcast(OtherActor, this->GetOwner());
-	}
+	}*/
 }

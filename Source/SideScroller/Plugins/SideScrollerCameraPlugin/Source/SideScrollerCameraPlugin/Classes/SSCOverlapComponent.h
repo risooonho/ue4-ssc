@@ -6,6 +6,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/BoxComponent.h"
 
 #include "SSCOverlapComponent.generated.h"
 
@@ -18,9 +19,9 @@ namespace ESSCTypes {
 	};
 }
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSSCOverlapComponentBeginOverlapSignature, FVector, TargetLocation, float, ArmLength, bool, FollowCharZ);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSSCOverlapComponentBeginOverlapSignature, FVector, TargetLocation, float, ArmLength, bool, FollowCharZ);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(SideScrollerCamera), meta=(BlueprintSpawnableComponent) )
 class SIDESCROLLERCAMERAPLUGIN_API USSCOverlapComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -38,12 +39,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
+	void BeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult &SweepResult);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller") //Sollte BlueprintAssignable sein, geht jedoch nicht, später mal nachschauen
+	UBoxComponent *BoxComponent;
 
 	/* Distance in which the camera will follow the target, in cm */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
@@ -56,8 +61,8 @@ public:
 	float ArmLength;
 
 	/* Event when OverlapComponent begins Overlap with SideScrollerFollowComponent */
-	UPROPERTY(BlueprintAssignable, Category = "SideScroller")
-	FSSCOverlapComponentBeginOverlapSignature OnOverlapWithOverlapComponent;
+	/*UPROPERTY(BlueprintAssignable, Category = "SideScroller")
+	FSSCOverlapComponentBeginOverlapSignature OnOverlapWithOverlapComponent;*/
 
 	/* All Following not yet implemented */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
@@ -90,5 +95,5 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 	bool bMinZ;
 
-	FDelegateHandle MyDelegateHandle;
+	//FDelegateHandle MyDelegateHandle;
 };

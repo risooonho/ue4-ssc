@@ -24,7 +24,7 @@ namespace ESSCCameraID {
 	};
 }
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(SideScrollerCamera), meta=(BlueprintSpawnableComponent) )
 class USideScrollerFollowComponent : public UActorComponent
 {
 	GENERATED_BODY()

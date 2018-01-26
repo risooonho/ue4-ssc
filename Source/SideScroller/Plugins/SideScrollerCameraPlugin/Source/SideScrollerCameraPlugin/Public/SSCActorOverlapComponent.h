@@ -12,7 +12,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSSCActorOverlapComponentBeginOverlapSignature, AActor*, SSCOverlapActor, AActor*, SideScrollerFollowActor);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(SideScrollerCamera), meta=(BlueprintSpawnableComponent) )
 class SIDESCROLLERCAMERAPLUGIN_API USSCActorOverlapComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -30,12 +30,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	/* Create BoxComponent to check for SSCOverlapComponents*/
-	UPROPERTY(BlueprintAssignable, Category = "SideScroller")
-	UBoxComponent *BoxComponent;
+	/*UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller") //Sollte BlueprintAssignable sein, geht jedoch nicht, später mal nachschauen
+	UBoxComponent *BoxComponent;*/
 
 	/* Event when OverlapComponent begins Overlap with SideScrollerFollowComponent */
-	UPROPERTY(BlueprintAssignable, Category = "SideScroller")
-	FSSCActorOverlapComponentBeginOverlapSignature OnActorOverlapWithSSCOverlapComponent;
+	/*UPROPERTY(EditAnywhere, Category = "SideScroller") //Sollte BlueprintAssignable sein, geht jedoch nicht, später mal nachschauen // EditAnywhere muss noch unbedingt ersetzt werden
+	FSSCActorOverlapComponentBeginOverlapSignature OnActorOverlapWithSSCOverlapComponent;*/
 
 	UFUNCTION()
 		void BeginOverlap(UPrimitiveComponent* OverlappedComponent,

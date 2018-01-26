@@ -20,7 +20,7 @@ namespace EDefaultCameraTypeTwo {
 	};
 }
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(SideScrollerCamera), meta=(BlueprintSpawnableComponent) )
 class SIDESCROLLERCAMERAPLUGIN_API USSCCameraComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -109,4 +109,10 @@ public:
 
 	UFUNCTION()
 		void UpdateCameraParameters(FVector TargetLocation, float Armlength, bool FollowCharZ);
+		//void UpdateCameraParameters();
+
+	UFUNCTION()
+		void Testfunction();
+
+	FDelegateHandle MyDelegateHandle;
 };
