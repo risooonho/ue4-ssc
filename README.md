@@ -20,6 +20,7 @@ Planned things for v0.1 release:
 * Establish naming conventions for c++ files
 * Implement automated Testing
 * Create a Wiki
+* Update the plugin to the newest UE4-version
 
 Ongoing: Update Example Map and Wiki with implemented features
 
