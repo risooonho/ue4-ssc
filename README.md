@@ -6,15 +6,17 @@ Note that this plugin is still in a very early stage and in heavy developement.
 Things in place:
 * Camera starting settings (Follow or static, initial camera arm length, initial camera rotation, interpolation speed, z-axis offset)
 * Follow one or more Actors with camera
+* First Settings are updated when overlapping with viable Actors with SSCOverlapComponent
 
 
 Planned things for v0.1 release:
-* Update camera settings when actors with FollowComponent overlapping with Triggers with OverlapComponent
+* Update camera settings when actors with FollowComponent overlapping with viable Actors with OverlapComponent
 * Integrate Multiplayer including one Screen and Splitscreen
 * Option for ignoring z-axis movement of actors (e.g. for ignore jumping)
 * Integrate x,y,z-Axis limitations (e.g. for hidden rooms or level-endings)
 * Integrate spline-oriented camera rotation for movement in 3-dimensional levels
 * Replace the Side Scroller Camera with a Component
+* Replace SSCGameMode with SSCSystemManager for delegating Events so you can use this Plugin with every Gamemode
 * Establish naming conventions for c++ files
 * Implement automated Testing
 * Create a Wiki
