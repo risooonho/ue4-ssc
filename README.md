@@ -6,7 +6,7 @@ Note that this plugin is still in a very early stage and in heavy developement.
 Things in place:
 * Camera starting settings (Follow or static, initial camera arm length, initial camera rotation, interpolation speed, z-axis offset)
 * Follow one or more Actors with camera
-* First Settings are updated when overlapping with viable Actors with SSCOverlapComponent
+* First Settings are updated when overlapping with viable Actors with SSCOverlapComponent (on feature/OverlapComponent Branch)
 
 
 Planned things for v0.1 release:
