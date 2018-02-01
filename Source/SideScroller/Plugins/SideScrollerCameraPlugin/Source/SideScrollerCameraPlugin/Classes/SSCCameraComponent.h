@@ -8,19 +8,12 @@
 #include "Components/ActorComponent.h"
 
 #include "SSCOverlapComponent.h"
-#include "SideScrollerFollowComponent.h" // Just for enum, can be deletet when enum has its own class
+#include "SSCBlueprintFunctionLibrary.h"
 
 #include "SSCCameraComponent.generated.h"
 
-UENUM()
-namespace EDefaultCameraTypeTwo {
-	enum Type {
-		Follow,
-		Static
-	};
-}
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(SideScrollerCamera), meta=(BlueprintSpawnableComponent) )
 class SIDESCROLLERCAMERAPLUGIN_API USSCCameraComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -43,7 +36,9 @@ protected:
 
 	bool ProtectedFollowCharZ;
 
-	TEnumAsByte<EDefaultCameraTypeTwo::Type> ProtectedCameraType;
+	TEnumAsByte<ESSCTypes::SSCCameraType> ProtectedCameraType;
+
+	FUpdateCameraParametersStruct ProtectedCameraParametersInstance;
 
 	/* Default camera z-axis ofset, in cm */
 	float ProtectedCameraOffsetZ;
@@ -82,7 +77,7 @@ public:
 
 	/*Set Default camera Type for situations, where camera-targets are in no overlapping SSCOverlapComponent */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-		TEnumAsByte<EDefaultCameraTypeTwo::Type> DefaultCameraType;
+		TEnumAsByte<ESSCTypes::SSCCameraType> DefaultCameraType;
 
 	/* Default camera z-axis ofset, in cm */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
@@ -108,5 +103,8 @@ public:
 		bool bDefaultFollowCharZ;
 
 	UFUNCTION()
-		void UpdateCameraParameters(FVector TargetLocation, float Armlength, bool FollowCharZ);
+		//void UpdateCameraParameters(FVector TargetLocation, float Armlength, bool FollowCharZ);
+		void UpdateCameraParameters(FUpdateCameraParametersStruct newCameraParameters);
+
+	FDelegateHandle MyDelegateHandle;
 };

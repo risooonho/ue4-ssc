@@ -6,21 +6,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/BoxComponent.h"
+
+#include "SSCBlueprintFunctionLibrary.h"
 
 #include "SSCOverlapComponent.generated.h"
 
-// Will ich noch in seperate Datei verpacken
-UENUM()
-namespace ESSCTypes {
-	enum Type {
-		Follow,
-		Static
-	};
-}
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSSCOverlapComponentBeginOverlapSignature, FVector, TargetLocation, float, ArmLength, bool, FollowCharZ);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSSCOverlapComponentBeginOverlapSignature, FVector, TargetLocation, float, ArmLength, bool, FollowCharZ);
+
+UCLASS( ClassGroup=(SideScrollerCamera), meta=(BlueprintSpawnableComponent) )
 class SIDESCROLLERCAMERAPLUGIN_API USSCOverlapComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -38,55 +34,27 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
+	void BeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult &SweepResult);
 
+	UBoxComponent *BoxComponent;
+
+	UPROPERTY(EditAnywhere)
+	FUpdateCameraParametersStruct cameraParametersInstance;
+
 	/* Distance in which the camera will follow the target, in cm */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	TEnumAsByte<ESSCTypes::Type> SSCType; 
+	TEnumAsByte<ESSCTypes::SSCCameraType> SSCType; 
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	FVector TargetLocation;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	float ArmLength;
 
 	/* Event when OverlapComponent begins Overlap with SideScrollerFollowComponent */
-	UPROPERTY(BlueprintAssignable, Category = "SideScroller")
-	FSSCOverlapComponentBeginOverlapSignature OnOverlapWithOverlapComponent;
+	/*UPROPERTY(BlueprintAssignable, Category = "SideScroller")
+	FSSCOverlapComponentBeginOverlapSignature OnOverlapWithOverlapComponent;*/
 
-	/* All Following not yet implemented */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	bool FollowCharZ;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	float MinZ;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	float MaxZ;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	float MinX;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	float MaxX;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	float MinY;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	float MaxY;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	bool bMinX;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	bool bMinY;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-	bool bMinZ;
+	//FDelegateHandle MyDelegateHandle;
 };

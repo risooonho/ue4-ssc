@@ -6,26 +6,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Components/BoxComponent.h"
+
+#include "SSCBlueprintFunctionLibrary.h"
 
 #include "SideScrollerFollowComponent.generated.h"
 
-
-UENUM()
-namespace ESSCCameraID {
-	enum SSCCameraID {
-		Camera0,
-		Camera1,
-		Camera2,
-		Camera3,
-		Camera4,
-		Camera5,
-		Camera6,
-		Camera7
-	};
-}
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(SideScrollerCamera), meta=(BlueprintSpawnableComponent) )
 class USideScrollerFollowComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -43,11 +29,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void GetSSCOverlapComponents();
-
-	/* Create BoxComponent to check for SSCOverlapComponents*/
-	UBoxComponent *BoxComponent;
-
 	/* Enable/Disables Multiplayer-Options of Component */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 	bool bMultipleCameras;
@@ -55,14 +36,6 @@ public:
 	/* If Multiplayer-Option is enabled, only Actors with proper ID's will be followed */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 	TEnumAsByte<ESSCCameraID::SSCCameraID> CameraID;
-
-	UFUNCTION()
-		void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
-			AActor* OtherActor,
-			UPrimitiveComponent* OtherComp,
-			int32 OtherBodyIndex,
-			bool bFromSweep,
-			const FHitResult &SweepResult);
 };
 
 
