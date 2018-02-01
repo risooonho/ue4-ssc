@@ -36,6 +36,7 @@ void USSCCameraComponent::BeginPlay()
 	ProtectedCameraParametersInstance.TargetLocation = DefaultTargetLocation;
 	ProtectedCameraParametersInstance.Armlength = DefaultCameraArm;
 	ProtectedCameraParametersInstance.FollowCharZ = bDefaultFollowCharZ;
+	ProtectedCameraParametersInstance.CenterOfSphericalMovement = FVector(0, 0, 0);
 
 	UWorld* TheWorld = GetWorld();
 	if (TheWorld != nullptr)
@@ -137,11 +138,28 @@ void USSCCameraComponent::SetCameraLocation(FVector ActorsLocation)
 		case ESSCTypes::Static:
 			// Set camera to DefaultTargetLocation and apply z-axis camera-offset
 			NewLocation = ProtectedCameraParametersInstance.TargetLocation + GetOwner()->GetActorUpVector() * DefaultCameraOffsetZ;
-			GetOwner()->SetActorLocation(NewLocation);
+
+			if (ProtectedCameraParametersInstance.CameraSplinePath)
+			{
+				UE_LOG(SSCLog, Warning, TEXT("Camera is set to static, but CameraSplinePath is activated"));
+			}
 			break;
 		case ESSCTypes::Follow:
 			// Set camera distance in relation to rotation
 			NewLocation = ActorsLocation + GetOwner()->GetActorForwardVector() * ProtectedCameraParametersInstance.Armlength + GetOwner()->GetActorUpVector() * DefaultCameraOffsetZ;
+			
+			// Camera on Spline not tested at all
+			if (ProtectedCameraParametersInstance.CameraSplinePath)
+			{
+				if (ProtectedCameraParametersInstance.CameraSplinePath != nullptr)
+				{
+					NewLocation = ProtectedCameraParametersInstance.CameraSplinePath->FindLocationClosestToWorldLocation(ActorsLocation, ESplineCoordinateSpace::World);
+				}
+				else
+				{
+					UE_LOG(SSCLog, Error, TEXT("Camera is set to Spline, but no CameraSplinePath is linked"));
+				}
+			}
 
 			// Calculate camera location with InterpolationSpeed
 			if (bInterpolationSpeed)
@@ -149,18 +167,40 @@ void USSCCameraComponent::SetCameraLocation(FVector ActorsLocation)
 				NewLocation = FMath::VInterpTo(GetOwner()->GetActorLocation(), NewLocation, GetWorld()->GetDeltaSeconds(), InterpolationSpeed);
 			}
 
-			GetOwner()->SetActorLocation(NewLocation);
 			break;
 
 		case ESSCTypes::Cylindrical:
+			// Set camera location always facing the center with a fixed distance (armlength) to the center of all followed actors...
+			NewLocation = ActorsLocation - ProtectedCameraParametersInstance.CenterOfSphericalMovement;
+			NewLocation = NewLocation.GetSafeNormal();
+			NewLocation = NewLocation * ProtectedCameraParametersInstance.Armlength * -1 + ActorsLocation;
 
+			// ... with a rotation suitable to all followed actors
+			GetOwner()->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetOwner()->GetActorLocation(), ActorsLocation));
+			
+			// Cylindrical movement along spline - not tested at all
+			if (ProtectedCameraParametersInstance.CameraSplinePath)
+			{
+				if (ProtectedCameraParametersInstance.CameraSplinePath != nullptr)
+				{
+					NewLocation = ProtectedCameraParametersInstance.CameraSplinePath->FindLocationClosestToWorldLocation(ActorsLocation, ESplineCoordinateSpace::World);
+				}
+				else
+				{
+					UE_LOG(SSCLog, Error, TEXT("Camera is set to Spline, but no CameraSplinePath is linked"));
+				}
+			}
 
+			// Calculate camera location with InterpolationSpeed
+			if (bInterpolationSpeed) {
+				NewLocation = FMath::VInterpConstantTo(GetOwner()->GetActorLocation(), NewLocation, GetWorld()->GetDeltaSeconds(), InterpolationSpeed);
+			}
 			break;
-		case ESSCTypes::Spline:
-
-			break;
-
 	};	
+
+
+	GetOwner()->SetActorLocation(NewLocation);
+
 }
 
 // Update Camera Parameters

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Components/SplineComponent.h"
 
 #include "SSCBlueprintFunctionLibrary.generated.h"
 
@@ -27,8 +28,7 @@ namespace ESSCTypes {
 	enum SSCCameraType {
 		Follow,
 		Static,
-		Cylindrical,
-		Spline
+		Cylindrical
 	};
 }
 
@@ -90,6 +90,15 @@ struct FUpdateCameraParametersStruct
 
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "bMaxZ"))
 	float MaxZ;
+
+	UPROPERTY(EditAnywhere)
+	FVector CenterOfSphericalMovement;
+
+	UPROPERTY(EditAnywhere)
+	bool bCameraSplinePath;
+
+	UPROPERTY(EditAnywhere, meta = (EditCondition = "bCameraSplinePath"))
+	USplineComponent * CameraSplinePath;
 };
 
 UCLASS()
