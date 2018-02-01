@@ -43,7 +43,7 @@ void USSCCameraComponent::BeginPlay()
 		ASSCGameMode* SSCGameMode = Cast<ASSCGameMode>(GameMode);
 		if (SSCGameMode != nullptr)
 		{
-			SSCGameMode->UpdateCameraDelegate.AddDynamic(this, &USSCCameraComponent::UpdateCameraParameters);
+			//SSCGameMode->UpdateCameraDelegate.AddDynamic(this, &USSCCameraComponent::UpdateCameraParameters);
 		}
 
 	}
@@ -214,26 +214,48 @@ bool USSCCameraComponent::AreActorsMoving(FVector ActorsToFollowLocation)
 // Manual Camera Movement
 void USSCCameraComponent::ManuallyRotateCamera(float DeltaTime)
 {
+
+	// manual camera rotation
 	if (GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) != 0 || GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) != 0)
 	{
-		ManualCameraXValue = ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
-		ManualCameraYValue = ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+		if (GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) > 0 && (ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed) <= ManualCameraMaxYawValue)
+		{
+			ManualCameraXValue = ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator((GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0, 0));
+		}
+		else if (GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) < 0 && (ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed) >= ManualCameraMaxYawValue * -1)
+		{
+			ManualCameraXValue = ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator((GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0, 0));
+		}
 
-
-		GetOwner()->AddActorLocalRotation(FRotator((GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0));
+		if (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) > 0 && (ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed) <= ManualCameraMaxPitchValue)
+		{
+			ManualCameraYValue = ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0, (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0));
+		}
+		else if (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) < 0 && (ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed) >= ManualCameraMaxPitchValue * -1)
+		{
+			ManualCameraYValue = ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0, (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0));
+		}
+		
 		GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
-
+		
 		if (ManualCameraBackwardsRotationTimeElapsed != 0 && bManualCameraBackwardsRotationWhenMoving == false)
 		{
 			ManualCameraBackwardsRotationTimeElapsed = 0;
 		}
 	}
+
+
+	// Backwards rotation
 	else if ((ManualCameraBackwardsRotationTimeElapsed >= ManualCameraBackwardsRotationTime && bManualCameraBackwardsRotationWhenMoving == false) || (bManualCameraBackwardsRotationWhenMoving == true && bAreActorsToFollowMoving == true))
 	{
 		if (ManualCameraXValue < 0)
 		{
-			ManualCameraXValue = ManualCameraXValue + 0.1f;
-			GetOwner()->AddActorLocalRotation(FRotator(0.1f, 0, 0));
+			ManualCameraXValue = ManualCameraXValue + 0.1f * ManualCameraBackwardsRotatingSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0.1f * ManualCameraBackwardsRotatingSpeed, 0, 0));
 			GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
 
 			if (ManualCameraXValue < -180)
@@ -243,8 +265,8 @@ void USSCCameraComponent::ManuallyRotateCamera(float DeltaTime)
 		}
 		else if (ManualCameraXValue > 0)
 		{
-			ManualCameraXValue = ManualCameraXValue - 0.1f;
-			GetOwner()->AddActorLocalRotation(FRotator(-0.1f, 0, 0));
+			ManualCameraXValue = ManualCameraXValue - 0.1f * ManualCameraBackwardsRotatingSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(-0.1f * ManualCameraBackwardsRotatingSpeed, 0, 0));
 			GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
 
 			if (ManualCameraXValue > 180)
@@ -255,8 +277,8 @@ void USSCCameraComponent::ManuallyRotateCamera(float DeltaTime)
 
 		if (ManualCameraYValue < 0)
 		{
-			ManualCameraYValue = ManualCameraYValue + 0.1f;
-			GetOwner()->AddActorLocalRotation(FRotator(0, 0.1f, 0));
+			ManualCameraYValue = ManualCameraYValue + 0.1f * ManualCameraBackwardsRotatingSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0, 0.1f * ManualCameraBackwardsRotatingSpeed, 0));
 			GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
 
 			if (ManualCameraYValue < -180)
@@ -266,8 +288,8 @@ void USSCCameraComponent::ManuallyRotateCamera(float DeltaTime)
 		}
 		else if (ManualCameraYValue > 0)
 		{
-			ManualCameraYValue = ManualCameraYValue - 0.1f;
-			GetOwner()->AddActorLocalRotation(FRotator(0, - 0.1f, 0));
+			ManualCameraYValue = ManualCameraYValue - 0.1f * ManualCameraBackwardsRotatingSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0, - 0.1f * ManualCameraBackwardsRotatingSpeed, 0));
 			GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
 
 			if (ManualCameraYValue > 180)
@@ -276,16 +298,18 @@ void USSCCameraComponent::ManuallyRotateCamera(float DeltaTime)
 			}
 		}
 
-		if (FMath::IsNearlyZero(ManualCameraXValue, 0.1f))
+		if (FMath::IsNearlyZero(ManualCameraXValue, 0.1f * ManualCameraBackwardsRotatingSpeed))
 		{
 			ManualCameraXValue = 0.0f;
 		}
 
-		if (FMath::IsNearlyZero(ManualCameraYValue, 0.1f))
+		if (FMath::IsNearlyZero(ManualCameraYValue, 0.1f * ManualCameraBackwardsRotatingSpeed))
 		{
 			ManualCameraYValue = 0.0f;
 		}
 	}
+
+	// Count time for backwards rotation if backwards rotation is time dependent
 	else if (bManualCameraBackwardsRotationWhenMoving == false)
 	{
 		ManualCameraBackwardsRotationTimeElapsed += DeltaTime;

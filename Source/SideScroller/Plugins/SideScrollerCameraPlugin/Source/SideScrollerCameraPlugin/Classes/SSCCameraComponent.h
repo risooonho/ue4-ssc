@@ -142,13 +142,13 @@ public:
 		float ManualCameraRotationSpeed = 50;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
-		bool bLimitManualCameraRotation;
+		bool bLimitManualCameraRotation = true;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bLimitManualCameraRotation"))
-		float ManualCameraMaxPitchValue;
+		float ManualCameraMaxPitchValue = 90;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bLimitManualCameraRotation"))
-		float ManualCameraMaxYawValue;
+		float ManualCameraMaxYawValue = 90;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 		bool bManualCameraBackwardsRotationWhenMoving;
@@ -158,6 +158,9 @@ public:
 
 	UFUNCTION()
 		bool AreActorsMoving(FVector ActorsToFollowLocation);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
+		float ManualCameraBackwardsRotatingSpeed = 1;
 
 	FDelegateHandle MyDelegateHandle;
 };
