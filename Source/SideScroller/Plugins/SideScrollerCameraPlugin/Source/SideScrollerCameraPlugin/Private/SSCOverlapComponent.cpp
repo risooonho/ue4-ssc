@@ -66,7 +66,7 @@ void USSCOverlapComponent::BeginOverlap(UPrimitiveComponent* OverlappedComponent
 			ASSCGameMode* MyGameMode = Cast<ASSCGameMode>(GameMode);
 			if (MyGameMode != nullptr)
 			{
-				MyGameMode->UpdateCameraDelegate.Broadcast(TargetLocation, ArmLength, FollowCharZ);
+				MyGameMode->UpdateCameraDelegate.Broadcast(cameraParametersInstance);
 			}
 			else
 			{

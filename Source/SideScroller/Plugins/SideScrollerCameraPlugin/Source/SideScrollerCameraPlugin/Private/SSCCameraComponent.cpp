@@ -7,6 +7,8 @@
 #include "GameFramework/GameMode.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "SSCBlueprintFunctionLibrary.h"
+
 #include "SideScrollerFollowComponent.h"
 #include "SSCActorOverlapComponent.h"
 #include "SSCGameMode.h"
@@ -32,9 +34,9 @@ void USSCCameraComponent::BeginPlay()
 	GetOwner()->SetActorRotation(DefaultCameraAngle);
 
 	// Update protectedVariables to Default Camera Settings
-	ProtectedTargetLocation = DefaultTargetLocation;
-	ProtectedCameraArm = DefaultCameraArm;
-	ProtectedFollowCharZ = bDefaultFollowCharZ;
+	ProtectedCameraParametersInstance.TargetLocation = DefaultTargetLocation;
+	ProtectedCameraParametersInstance.Armlength = DefaultCameraArm;
+	ProtectedCameraParametersInstance.FollowCharZ = bDefaultFollowCharZ;
 
 	UWorld* TheWorld = GetWorld();
 	if (TheWorld != nullptr)
@@ -48,7 +50,6 @@ void USSCCameraComponent::BeginPlay()
 		
 	}
 	
-
 	// Get all actors to follow
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -91,33 +92,44 @@ void USSCCameraComponent::SetCameraLocation(FVector ActorsLocation)
 	return;
 	}*/
 
+	FVector NewLocation;
 
-	if (DefaultCameraType == EDefaultCameraTypeTwo::Static)
+	switch (DefaultCameraType)
 	{
-		// Set camera to DefaultTargetLocation and apply z-axis camera-offset
-		FVector NewLocation = ProtectedTargetLocation + GetOwner()->GetActorUpVector() * DefaultCameraOffsetZ;
-		GetOwner()->SetActorLocation(NewLocation);
-	}
-	else if (DefaultCameraType == EDefaultCameraTypeTwo::Follow)
-	{
-		// Set camera distance in relation to rotation
-		FVector NewLocation = ActorsLocation + GetOwner()->GetActorForwardVector() * ProtectedCameraArm + GetOwner()->GetActorUpVector() * DefaultCameraOffsetZ;
+		
+		case ESSCTypes::Static:
+			// Set camera to DefaultTargetLocation and apply z-axis camera-offset
+			NewLocation = ProtectedCameraParametersInstance.TargetLocation + GetOwner()->GetActorUpVector() * DefaultCameraOffsetZ;
+			GetOwner()->SetActorLocation(NewLocation);
+			break;
+		case ESSCTypes::Follow:
+			// Set camera distance in relation to rotation
+			NewLocation = ActorsLocation + GetOwner()->GetActorForwardVector() * ProtectedCameraParametersInstance.Armlength + GetOwner()->GetActorUpVector() * DefaultCameraOffsetZ;
 
-		// Calculate camera location with InterpolationSpeed
-		if (bInterpolationSpeed)
-		{
-			NewLocation = FMath::VInterpTo(GetOwner()->GetActorLocation(), NewLocation, GetWorld()->GetDeltaSeconds(), InterpolationSpeed);
-		}
+			// Calculate camera location with InterpolationSpeed
+			if (bInterpolationSpeed)
+			{
+				NewLocation = FMath::VInterpTo(GetOwner()->GetActorLocation(), NewLocation, GetWorld()->GetDeltaSeconds(), InterpolationSpeed);
+			}
 
-		GetOwner()->SetActorLocation(NewLocation);
-	}
+			GetOwner()->SetActorLocation(NewLocation);
+			break;
+
+		case ESSCTypes::Cylindrical:
+
+
+			break;
+		case ESSCTypes::Spline:
+
+			break;
+
+	};	
 }
 
-void USSCCameraComponent::UpdateCameraParameters(FVector TargetLocation, float Armlength, bool FollowCharZ)
+// Update Camera Parameters
+void USSCCameraComponent::UpdateCameraParameters(FUpdateCameraParametersStruct newCameraParameters)
 {
-	ProtectedTargetLocation = TargetLocation;
-	ProtectedCameraArm = Armlength;
-	ProtectedFollowCharZ = FollowCharZ;
+	ProtectedCameraParametersInstance = newCameraParameters;
 
 	UE_LOG(SSCLog, Log, TEXT("SSCCamera Updated"));
 }
@@ -142,9 +154,4 @@ FVector USSCCameraComponent::GetActorsLocation()
 	ActorsToFollowLocation = ActorsLocation;
 
 	return ActorsToFollowLocation;
-}
-
-void USSCCameraComponent::Testfunction()
-{
-	//
 }

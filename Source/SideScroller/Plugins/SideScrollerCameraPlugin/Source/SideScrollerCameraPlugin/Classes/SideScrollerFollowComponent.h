@@ -7,22 +7,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
+#include "SSCBlueprintFunctionLibrary.h"
+
 #include "SideScrollerFollowComponent.generated.h"
-
-
-UENUM()
-namespace ESSCCameraID {
-	enum SSCCameraID {
-		Camera0,
-		Camera1,
-		Camera2,
-		Camera3,
-		Camera4,
-		Camera5,
-		Camera6,
-		Camera7
-	};
-}
 
 UCLASS( ClassGroup=(SideScrollerCamera), meta=(BlueprintSpawnableComponent) )
 class USideScrollerFollowComponent : public UActorComponent

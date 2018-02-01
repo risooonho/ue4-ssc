@@ -7,9 +7,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 
+#include "SSCBlueprintFunctionLibrary.h"
+
 #include "SSCGameMode.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FUpdateCameraFromSSCOverlapSignature, FVector, TargetLocation, float, Armlength, bool, FollowCharZ);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateCameraFromSSCOverlapSignature, FUpdateCameraParametersStruct, cameraParametersInstance);
 
 UCLASS()
 class SIDESCROLLERCAMERAPLUGIN_API ASSCGameMode : public AGameModeBase
