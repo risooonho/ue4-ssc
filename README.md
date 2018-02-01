@@ -6,22 +6,23 @@ Note that this plugin is still in a very early stage and in heavy developement.
 Things in place:
 * Camera starting settings (Follow or static, initial camera arm length, initial camera rotation, interpolation speed, z-axis offset)
 * Follow one or more Actors with camera
-* First Settings are updated when overlapping with viable Actors with SSCOverlapComponent (on feature/OverlapComponent branch)
-* Basic manual camera movement (on feature/ManualCamera branch)
-
--> Feature branches will be merged shortly into the develop branch
+* First Settings are updated when overlapping with viable Actors with SSCOverlapComponent
+* Basic manual camera movement
 
 
 Furthermore planned things for v0.1 release:
 * Update camera settings when actors with FollowComponent overlapping with viable Actors with OverlapComponent
 * Integrate Multiplayer including one Screen and Splitscreen
-* Option for ignoring z-axis movement of actors (e.g. for ignore jumping)
+* Option for ignoring axis movement of actors (e.g. for ignore jumping)
 * Integrate x,y,z-Axis limitations (e.g. for hidden rooms or level-endings)
 * Replace SSCGameMode with SSCSystemManager for delegating Events so you can use this Plugin with every Gamemode
 * Establish naming conventions for c++ files
 * Implement automated Testing
 * Create a Wiki
 * Update the plugin to the newest UE4-version
+* Clean up most of the code and add comments
+* Add Spline-based camera movement
+* Clean up and order public variables on components
 
 Ongoing: Update Example Map and Wiki with implemented features
 
@@ -38,6 +39,9 @@ Ongoing: Update Example Map and Wiki with implemented features
 1. Add the Side Scroller Camera to your level.
 1. Set Up the Side Scroller Camera with your settings.
 1. For Follow-Settings: Put the Side Scroller Follow Component on every actor you wish to follow with the camera.
+
+## Known Issues
+* Manual Camera Rotation Offset, especially with slow interpolation-speed
 
 ## License
 
