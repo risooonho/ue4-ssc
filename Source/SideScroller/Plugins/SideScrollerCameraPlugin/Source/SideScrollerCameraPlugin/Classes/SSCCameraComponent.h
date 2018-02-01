@@ -26,6 +26,24 @@ private:
 	// Array for all Actors to follow with camera
 	TArray<AActor*> ActorsToFollow;
 
+	FInputAxisBinding ManualCameraX;
+
+	FInputAxisBinding ManualCameraY;
+
+	float ManualCameraXValue;
+
+	float ManualCameraYValue;
+
+	APlayerController* PlayerController;
+
+	float ManualCameraBackwardsRotationTimeElapsed;
+
+	bool bAreActorsToFollowMoving;
+
+	FVector ActorsToFollowLocation;
+
+	FVector ActorsToFollowLocationLastFrame;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -65,8 +83,6 @@ public:
 	// Calculate camera location
 	void SetCameraLocation(FVector ActorsLocation);
 
-	FVector ActorsToFollowLocation;
-
 	/* Distance in which the camera will follow the target, in cm */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 		float DefaultCameraArm;
@@ -91,20 +107,55 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 		TEnumAsByte<ESSCCameraID::SSCCameraID> CameraID;
 
-	/* Default Interpolation Speed as camera delay with dynamic movement, higher values = less delay */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-		float InterpolationSpeed;
-
 	/* Enable / Disable Delay for camera movement */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 		bool bInterpolationSpeed;
+
+	/* Default Interpolation Speed as camera delay with dynamic movement, higher values = less delay */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bInterpolationSpeed"))
+		float InterpolationSpeed;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 		bool bDefaultFollowCharZ;
 
 	UFUNCTION()
-		//void UpdateCameraParameters(FVector TargetLocation, float Armlength, bool FollowCharZ);
 		void UpdateCameraParameters(FUpdateCameraParametersStruct newCameraParameters);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
+		bool bManualCameraRotation;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
+		FName RotateCameraXAxisMappingName;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller" , meta = (EditCondition = "bManualCameraRotation"))
+		FName RotateCameraYAxisMappingName;
+
+	UFUNCTION()
+		void ManuallyRotateCamera(float deltaTime);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
+		float ManualCameraRotationSpeed = 50;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
+		bool bLimitManualCameraRotation = true;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bLimitManualCameraRotation"))
+		float ManualCameraMaxPitchValue = 90;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bLimitManualCameraRotation"))
+		float ManualCameraMaxYawValue = 90;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
+		bool bManualCameraBackwardsRotationWhenMoving;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "!bManualCameraBackwardsRotationWhenMoving"))
+		float ManualCameraBackwardsRotationTime = 1.0f;
+
+	UFUNCTION()
+		bool AreActorsMoving(FVector ActorsToFollowLocation);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
+		float ManualCameraBackwardsRotatingSpeed = 1;
 
 	FDelegateHandle MyDelegateHandle;
 };

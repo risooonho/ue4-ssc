@@ -2,13 +2,14 @@
 
 #include "SSCCameraComponent.h"
 
+#include "Components/InputComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/GameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "SSCBlueprintFunctionLibrary.h"
-
 #include "SideScrollerFollowComponent.h"
 #include "SSCActorOverlapComponent.h"
 #include "SSCGameMode.h"
@@ -17,11 +18,9 @@
 // Sets default values for this component's properties
 USSCCameraComponent::USSCCameraComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+// off to improve performance if you don't need them.
+PrimaryComponentTick.bCanEverTick = true;
 }
 
 
@@ -47,9 +46,10 @@ void USSCCameraComponent::BeginPlay()
 		{
 			SSCGameMode->UpdateCameraDelegate.AddDynamic(this, &USSCCameraComponent::UpdateCameraParameters);
 		}
-		
+
 	}
-	
+
+
 	// Get all actors to follow
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -72,7 +72,32 @@ void USSCCameraComponent::BeginPlay()
 			//SSCOverlapComponent->OnOverlapWithOverlapComponent.AddDynamic(this, &USSCCameraComponent::UpdateCameraParameters);
 		}
 	}
-	
+
+	// Check for manual camera rotation settings
+	if (bManualCameraRotation)
+	{
+		UE_LOG(SSCLog, Log, TEXT("ManualCameraRotation activated"));
+		if (RotateCameraXAxisMappingName != TEXT("None"))
+		{
+			if (GetOwner() != nullptr)
+			{
+				PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+
+				if (PlayerController != nullptr) //&& PlayerController->InputEnabled == false)
+				{
+					GetOwner()->EnableInput(PlayerController);
+
+					GetOwner()->InputComponent->BindAxis(RotateCameraXAxisMappingName); // <- hier nochmal schauen, ob das so okay oder der beste Weg ist
+					GetOwner()->InputComponent->BindAxis(RotateCameraYAxisMappingName); // <- hier nochmal schauen, ob das so okay oder der beste Weg ist
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(SSCLog, Warning, TEXT("ManualCameraRotation is activated, but no RotateCameraXAxisMapping is set"));
+		}
+	}
+
 }
 
 
@@ -82,6 +107,18 @@ void USSCCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	SetCameraLocation(GetActorsLocation());
+
+	if (bManualCameraRotation && PlayerController != nullptr)
+	{
+		ManuallyRotateCamera(DeltaTime);
+	}
+	else
+	{
+		if (PlayerController == nullptr)
+		{
+			UE_LOG(SSCLog, Warning, TEXT("MaualCameraRotation is set to true, but PlayerController is null"))
+		}
+	}
 }
 
 void USSCCameraComponent::SetCameraLocation(FVector ActorsLocation)
@@ -130,10 +167,9 @@ void USSCCameraComponent::SetCameraLocation(FVector ActorsLocation)
 void USSCCameraComponent::UpdateCameraParameters(FUpdateCameraParametersStruct newCameraParameters)
 {
 	ProtectedCameraParametersInstance = newCameraParameters;
-
-	UE_LOG(SSCLog, Log, TEXT("SSCCamera Updated"));
 }
 
+// Returns center of all followed Actors
 FVector USSCCameraComponent::GetActorsLocation()
 {
 	if (ActorsToFollow.Num() == 0) {
@@ -153,5 +189,150 @@ FVector USSCCameraComponent::GetActorsLocation()
 
 	ActorsToFollowLocation = ActorsLocation;
 
+	// If manual camera backwards movement is dependent on movement of followed actors, call AreActorsMoving function
+	if (bManualCameraBackwardsRotationWhenMoving == true)
+	{
+		AreActorsMoving(ActorsToFollowLocation);
+	}
+
 	return ActorsToFollowLocation;
+}
+
+// returns if one of the actors to follow is moving
+bool USSCCameraComponent::AreActorsMoving(FVector ActorsToFollowLocation)
+{
+	if (ActorsToFollowLocationLastFrame == FVector(0, 0, 0)) //auch mal schauen, obs da nichts besseres gibt
+	{
+		ActorsToFollowLocationLastFrame = ActorsToFollowLocation;
+		bAreActorsToFollowMoving = false;
+	}
+	else if (ActorsToFollowLocation == ActorsToFollowLocationLastFrame)
+	{
+		bAreActorsToFollowMoving = false;
+	}
+	else
+	{
+		bAreActorsToFollowMoving = true;
+	}
+
+	ActorsToFollowLocationLastFrame = ActorsToFollowLocation;
+	
+	return bAreActorsToFollowMoving;
+}
+
+// Manual Camera Movement
+void USSCCameraComponent::ManuallyRotateCamera(float DeltaTime)
+{
+
+	// manual camera rotation
+	if (GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) != 0 || GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) != 0)
+	{
+		if (GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) > 0 && (ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed) <= ManualCameraMaxYawValue)
+		{
+			ManualCameraXValue = ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator((GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0, 0));
+		}
+		else if (GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) < 0 && (ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed) >= ManualCameraMaxYawValue * -1)
+		{
+			ManualCameraXValue = ManualCameraXValue + GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator((GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0, 0));
+		}
+
+		if (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) > 0 && (ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed) <= ManualCameraMaxPitchValue)
+		{
+			ManualCameraYValue = ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0, (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0));
+		}
+		else if (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) < 0 && (ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed) >= ManualCameraMaxPitchValue * -1)
+		{
+			ManualCameraYValue = ManualCameraYValue + GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName) * DeltaTime * ManualCameraRotationSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0, (GetOwner()->GetInputAxisValue(RotateCameraYAxisMappingName)) * DeltaTime * ManualCameraRotationSpeed, 0));
+		}
+		
+		GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
+		
+		if (ManualCameraBackwardsRotationTimeElapsed != 0 && bManualCameraBackwardsRotationWhenMoving == false)
+		{
+			ManualCameraBackwardsRotationTimeElapsed = 0;
+		}
+	}
+
+
+	// Backwards rotation
+	else if ((ManualCameraBackwardsRotationTimeElapsed >= ManualCameraBackwardsRotationTime && bManualCameraBackwardsRotationWhenMoving == false) || (bManualCameraBackwardsRotationWhenMoving == true && bAreActorsToFollowMoving == true))
+	{
+		if (ManualCameraXValue < 0)
+		{
+			ManualCameraXValue = ManualCameraXValue + 0.1f * ManualCameraBackwardsRotatingSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0.1f * ManualCameraBackwardsRotatingSpeed, 0, 0));
+			GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
+
+			if (ManualCameraXValue < -180)
+			{
+				ManualCameraXValue += 360;
+			}
+		}
+		else if (ManualCameraXValue > 0)
+		{
+			ManualCameraXValue = ManualCameraXValue - 0.1f * ManualCameraBackwardsRotatingSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(-0.1f * ManualCameraBackwardsRotatingSpeed, 0, 0));
+			GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
+
+			if (ManualCameraXValue > 180)
+			{
+				ManualCameraXValue -= 360;
+			}
+		}
+
+		if (ManualCameraYValue < 0)
+		{
+			ManualCameraYValue = ManualCameraYValue + 0.1f * ManualCameraBackwardsRotatingSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0, 0.1f * ManualCameraBackwardsRotatingSpeed, 0));
+			GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
+
+			if (ManualCameraYValue < -180)
+			{
+				ManualCameraYValue += 360;
+			}
+		}
+		else if (ManualCameraYValue > 0)
+		{
+			ManualCameraYValue = ManualCameraYValue - 0.1f * ManualCameraBackwardsRotatingSpeed;
+			GetOwner()->AddActorLocalRotation(FRotator(0, - 0.1f * ManualCameraBackwardsRotatingSpeed, 0));
+			GetOwner()->SetActorRotation(FRotator(GetOwner()->GetActorRotation().Pitch, GetOwner()->GetActorRotation().Yaw, 0)); // <-- verursacht einen kurzen "offset" in der Kamera beim Drehen
+
+			if (ManualCameraYValue > 180)
+			{
+				ManualCameraYValue -= 360;
+			}
+		}
+
+		if (FMath::IsNearlyZero(ManualCameraXValue, 0.1f * ManualCameraBackwardsRotatingSpeed))
+		{
+			ManualCameraXValue = 0.0f;
+		}
+
+		if (FMath::IsNearlyZero(ManualCameraYValue, 0.1f * ManualCameraBackwardsRotatingSpeed))
+		{
+			ManualCameraYValue = 0.0f;
+		}
+	}
+
+	// Count time for backwards rotation if backwards rotation is time dependent
+	else if (bManualCameraBackwardsRotationWhenMoving == false)
+	{
+		ManualCameraBackwardsRotationTimeElapsed += DeltaTime;
+	}
+	
+	
+	//UE_LOG(SSCLog, Log, TEXT("Value %f"), GetOwner()->GetInputAxisValue(RotateCameraXAxisMappingName));
+
+	/*if (InputComponentz != nullptr)
+	{
+		//UE_LOG(SSCLog, Log, TEXT("Value %s"), (GetOwner()->InputComponent->bIsActive ? TEXT("True") : TEXT("False")));
+	}
+	else
+	{
+		UE_LOG(SSCLog, Error, TEXT("ManuallyRotateCamera() is called, but InputComponentn is null"));
+	}*/
 }
