@@ -50,6 +50,8 @@ private:
 
 	float SplineLength;
 
+	
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -149,8 +151,13 @@ public:
 	UFUNCTION()
 		bool AreActorsMoving(FVector ActorsToFollowLocation);
 
+	void AvoidObstacles();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
 		float ManualCameraBackwardsRotatingSpeed = 1;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
+		bool bAvoidObstacles;
 
 	FDelegateHandle MyDelegateHandle;
 };

@@ -96,7 +96,6 @@ void USSCCameraComponent::BeginPlay()
 			UE_LOG(SSCLog, Warning, TEXT("ManualCameraRotation is activated, but no RotateCameraXAxisMapping is set"));
 		}
 	}
-
 }
 
 
@@ -117,6 +116,11 @@ void USSCCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		{
 			UE_LOG(SSCLog, Warning, TEXT("MaualCameraRotation is set to true, but PlayerController is null"))
 		}
+	}
+
+	if (bAvoidObstacles)
+	{
+		AvoidObstacles();
 	}
 }
 
@@ -337,6 +341,31 @@ bool USSCCameraComponent::AreActorsMoving(FVector ActorsToFollowLocation)
 	ActorsToFollowLocationLastFrame = ActorsToFollowLocation;
 	
 	return bAreActorsToFollowMoving;
+}
+
+void USSCCameraComponent::AvoidObstacles()
+{	
+	// Disabled start of automated obstacle avoidance due to bad performance
+	/*
+	FHitResult HitLeft;
+	FHitResult HitRight;
+	FVector CollisionStart = GetOwner()->GetActorLocation();
+	FVector CollisionEnd = GetActorsLocation();
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(GetOwner());
+
+	const FName DebugTraceTag("DebugTraceTag");
+	GetWorld()->DebugDrawTraceTag = DebugTraceTag;
+	CollisionQueryParams.TraceTag = DebugTraceTag;
+
+
+	
+	// Left Trace
+	GetWorld()->SweepSingleByChannel(HitLeft, CollisionStart + GetOwner()->GetActorRightVector() * -300, CollisionEnd + GetOwner()->GetActorRightVector() * -300, FQuat::Identity, ECollisionChannel::ECC_Camera, FCollisionShape::MakeSphere(300), CollisionQueryParams);
+
+	// Right Trace
+	GetWorld()->SweepSingleByChannel(HitRight, CollisionStart + GetOwner()->GetActorRightVector() * 300, CollisionEnd + GetOwner()->GetActorRightVector() * 300, FQuat::Identity, ECollisionChannel::ECC_Camera, FCollisionShape::MakeSphere(300), CollisionQueryParams);
+	*/
 }
 
 // Manual Camera Movement
