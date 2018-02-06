@@ -37,6 +37,7 @@ void USSCCameraComponent::BeginPlay()
 	ProtectedCameraParametersInstance.Armlength = DefaultCameraArm;
 	ProtectedCameraParametersInstance.FollowCharZ = bDefaultFollowCharZ;
 	ProtectedCameraParametersInstance.CenterOfSphericalMovement = FVector(0, 0, 0);
+	ProtectedCameraParametersInstance.CameraSplinePath = CameraSplinePath;
 
 	UWorld* TheWorld = GetWorld();
 	if (TheWorld != nullptr)
@@ -161,11 +162,7 @@ void USSCCameraComponent::SetCameraLocation(FVector ActorsLocation)
 				}
 			}
 
-			// Calculate camera location with InterpolationSpeed
-			if (bInterpolationSpeed)
-			{
-				NewLocation = FMath::VInterpTo(GetOwner()->GetActorLocation(), NewLocation, GetWorld()->GetDeltaSeconds(), InterpolationSpeed);
-			}
+			
 
 			break;
 
@@ -191,12 +188,27 @@ void USSCCameraComponent::SetCameraLocation(FVector ActorsLocation)
 				}
 			}
 
-			// Calculate camera location with InterpolationSpeed
-			if (bInterpolationSpeed) {
-				NewLocation = FMath::VInterpConstantTo(GetOwner()->GetActorLocation(), NewLocation, GetWorld()->GetDeltaSeconds(), InterpolationSpeed);
+			
+		// Camera on Spline over time not tested at all
+		case ESSCTypes::SplineOverTime:
+			if (ProtectedCameraParametersInstance.CameraSplinePath == nullptr)
+			{
+				UE_LOG(SSCLog, Error, TEXT("Camera is set to SplineOverTime, but no CameraSplinePath is linked"));
 			}
+			else
+			{
+				NewLocation = ProtectedCameraParametersInstance.CameraSplinePath->GetLocationAtDistanceAlongSpline(ProtectedCameraParametersInstance.DistanceAlongSpline, ESplineCoordinateSpace::World);
+			}
+
+			
 			break;
 	};	
+
+	// Calculate camera location with InterpolationSpeed
+	if (bInterpolationSpeed && DefaultCameraType != ESSCTypes::Static)
+	{
+		NewLocation = FMath::VInterpConstantTo(GetOwner()->GetActorLocation(), NewLocation, GetWorld()->GetDeltaSeconds(), InterpolationSpeed);
+	}
 
 
 	GetOwner()->SetActorLocation(NewLocation);
@@ -216,7 +228,7 @@ FVector USSCCameraComponent::GetActorsLocation()
 		return{};
 	}
 
-	FVector ActorsLocation = FVector(0.0f, 0.0f, 0.0f);
+	FVector ActorsLocation;
 
 	for (AActor* Actors : ActorsToFollow)
 	{
@@ -230,6 +242,7 @@ FVector USSCCameraComponent::GetActorsLocation()
 	ActorsToFollowLocation = ActorsLocation;
 
 	// If manual camera backwards movement is dependent on movement of followed actors, call AreActorsMoving function
+	// Dunno if this is here okay or better called from tick (with skippable frames?)
 	if (bManualCameraBackwardsRotationWhenMoving == true)
 	{
 		AreActorsMoving(ActorsToFollowLocation);

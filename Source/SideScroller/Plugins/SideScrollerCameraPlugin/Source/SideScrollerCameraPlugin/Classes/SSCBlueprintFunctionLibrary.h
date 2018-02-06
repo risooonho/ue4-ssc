@@ -28,7 +28,8 @@ namespace ESSCTypes {
 	enum SSCCameraType {
 		Follow,
 		Static,
-		Cylindrical
+		Cylindrical,
+		SplineOverTime
 	};
 }
 
@@ -99,6 +100,8 @@ struct FUpdateCameraParametersStruct
 
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "bCameraSplinePath"))
 	USplineComponent * CameraSplinePath;
+
+	float DistanceAlongSpline;
 };
 
 UCLASS()

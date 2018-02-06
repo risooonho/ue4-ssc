@@ -157,5 +157,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
 		float ManualCameraBackwardsRotatingSpeed = 1;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
+		USplineComponent * CameraSplinePath;
+
 	FDelegateHandle MyDelegateHandle;
 };
