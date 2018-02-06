@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "Components/SplineComponent.h"
 
 #include "SSCBlueprintFunctionLibrary.generated.h"
 
@@ -93,15 +92,18 @@ struct FUpdateCameraParametersStruct
 	float MaxZ;
 
 	UPROPERTY(EditAnywhere)
-	FVector CenterOfSphericalMovement;
+	FVector CenterOfCylindricalMovement;
 
 	UPROPERTY(EditAnywhere)
 	bool bCameraSplinePath;
 
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "bCameraSplinePath"))
-	USplineComponent * CameraSplinePath;
+	AActor * CameraSplinePath;
 
-	float DistanceAlongSpline;
+	//float DistanceAlongSpline;
+
+	UPROPERTY(EditAnywhere, meta = (EditCondition = "bCameraSplinePath"))
+	float SplineOverTimeTime;
 };
 
 UCLASS()

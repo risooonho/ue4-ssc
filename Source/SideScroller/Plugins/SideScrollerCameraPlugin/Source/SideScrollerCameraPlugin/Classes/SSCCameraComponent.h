@@ -44,6 +44,12 @@ private:
 
 	FVector ActorsToFollowLocationLastFrame;
 
+	float SplineOverTimeTimeElapsed = 0;
+
+	float Splinepoint = 0;
+
+	float SplineLength;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -74,6 +80,10 @@ protected:
 	bool bProtectedInterpolationSpeed;
 
 public:	
+
+	UPROPERTY(EditAnywhere)
+		FUpdateCameraParametersStruct DefaultCameraParameters;
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -83,25 +93,13 @@ public:
 	// Calculate camera location
 	void SetCameraLocation(FVector ActorsLocation);
 
-	/* Distance in which the camera will follow the target, in cm */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-		float DefaultCameraArm;
-
 	/* Angle in which the camera will follow the target */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 		FRotator DefaultCameraAngle;
 
-	/*Set Default camera Type for situations, where camera-targets are in no overlapping SSCOverlapComponent */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-		TEnumAsByte<ESSCTypes::SSCCameraType> DefaultCameraType;
-
 	/* Default camera z-axis ofset, in cm */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
 		float DefaultCameraOffsetZ;
-
-	/* Default target location for static camera */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-		FVector DefaultTargetLocation;
 
 	/* If Multiplayer-Option is enabled at any SideScrollerFollowComponents, only Actors with proper ID's will be followed - not yet implemented */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
@@ -114,9 +112,6 @@ public:
 	/* Default Interpolation Speed as camera delay with dynamic movement, higher values = less delay */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bInterpolationSpeed"))
 		float InterpolationSpeed;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-		bool bDefaultFollowCharZ;
 
 	UFUNCTION()
 		void UpdateCameraParameters(FUpdateCameraParametersStruct newCameraParameters);
@@ -156,9 +151,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
 		float ManualCameraBackwardsRotatingSpeed = 1;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
-		USplineComponent * CameraSplinePath;
 
 	FDelegateHandle MyDelegateHandle;
 };

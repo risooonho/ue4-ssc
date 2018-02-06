@@ -1,13 +1,13 @@
-# SideScroller Camera Plugin for UE4
+﻿# SideScroller Camera Plugin for UE4
 SideScroller Camera Plugin for Unreal Engine 4
 
 Note that this plugin is still in a very early stage and in heavy developement.
 
 Things in place:
-* Camera starting settings (Follow or static, initial camera arm length, initial camera rotation, interpolation speed, z-axis offset)
-* Follow one or more Actors with camera
+* Most of camera starting settings
 * First Settings are updated when overlapping with viable Actors with SSCOverlapComponent
 * Basic manual camera movement
+* Different Camera types (static, follow, cylindrical, spline)
 
 
 Furthermore planned things for v0.1 release:
@@ -21,10 +21,11 @@ Furthermore planned things for v0.1 release:
 * Create a Wiki
 * Update the plugin to the newest UE4-version
 * Clean up most of the code and add comments
-* Add Spline-based camera movement
 * Clean up and order public variables on components
+* Clean up SSCLog Messages and stop spamming Logs
+* Optional automatic camera movement when followed actor is not visible for the camera due to opstacles between followed actor and camera (option for one followed actor only)
 
-Ongoing: Update Example Map and Wiki with implemented features
+"Ongoing": Update Example Map and Wiki with implemented features
 
 ## Adding The Plugin
 
