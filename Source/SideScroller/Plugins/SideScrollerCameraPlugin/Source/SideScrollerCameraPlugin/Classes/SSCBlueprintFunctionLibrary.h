@@ -28,7 +28,7 @@ namespace ESSCTypes {
 		Follow,
 		Static,
 		Cylindrical,
-		Spline
+		SplineOverTime
 	};
 }
 
@@ -90,6 +90,20 @@ struct FUpdateCameraParametersStruct
 
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "bMaxZ"))
 	float MaxZ;
+
+	UPROPERTY(EditAnywhere)
+	FVector CenterOfCylindricalMovement;
+
+	UPROPERTY(EditAnywhere)
+	bool bCameraSplinePath;
+
+	UPROPERTY(EditAnywhere, meta = (EditCondition = "bCameraSplinePath"))
+	AActor * CameraSplinePath;
+
+	//float DistanceAlongSpline;
+
+	UPROPERTY(EditAnywhere, meta = (EditCondition = "bCameraSplinePath"))
+	float SplineOverTimeTime;
 };
 
 UCLASS()
