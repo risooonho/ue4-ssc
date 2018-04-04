@@ -8,7 +8,6 @@
 #include "Components/ActorComponent.h"
 
 #include "SSCOverlapComponent.h"
-#include "SSCBlueprintFunctionLibrary.h"
 
 #include "SSCCameraComponent.generated.h"
 
@@ -113,7 +112,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bInterpolationSpeed"))
 		float InterpolationSpeed;
 
-	UFUNCTION()
+	UFUNCTION()//BlueprintCallable, Category = "SideScroller") //<--- checken, warum das nicht möglich ist
 		void UpdateCameraParameters(FUpdateCameraParametersStruct newCameraParameters);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
@@ -149,8 +148,13 @@ public:
 	UFUNCTION()
 		bool AreActorsMoving(FVector ActorsToFollowLocation);
 
+	void AvoidObstacles();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller", meta = (EditCondition = "bManualCameraRotation"))
 		float ManualCameraBackwardsRotatingSpeed = 1;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SideScroller")
+		bool bAvoidObstacles;
 
 	FDelegateHandle MyDelegateHandle;
 };

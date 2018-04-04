@@ -24,6 +24,7 @@ Furthermore planned things for v0.1 release:
 * Clean up and order public variables on components
 * Clean up SSCLog Messages and stop spamming Logs
 * Optional automatic camera movement when followed actor is not visible for the camera due to opstacles between followed actor and camera (option for one followed actor only)
+* Make all relevant functions blueprint-usable
 
 "Ongoing": Update Example Map and Wiki with implemented features
 

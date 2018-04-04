@@ -8,8 +8,6 @@
 #include "Components/ActorComponent.h"
 #include "Components/BoxComponent.h"
 
-#include "SSCBlueprintFunctionLibrary.h"
-
 #include "SSCOverlapComponent.generated.h"
 
 

@@ -10,10 +10,10 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SplineComponent.h"
 
-#include "SSCBlueprintFunctionLibrary.h"
 #include "SideScrollerFollowComponent.h"
 #include "SSCActorOverlapComponent.h"
 #include "SSCGameMode.h"
+#include "SSCBlueprintFunctionLibrary.h"
 
 
 // Sets default values for this component's properties
@@ -22,6 +22,14 @@ USSCCameraComponent::USSCCameraComponent()
 // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 // off to improve performance if you don't need them.
 PrimaryComponentTick.bCanEverTick = true;
+
+UWorld* TheWorld = GetWorld();
+if (TheWorld != nullptr)
+{
+	TArray<AActor*> EventHandlers;
+	
+	//USSCEventHandler EventHandler = TheWorld->actor
+}
 }
 
 
@@ -29,6 +37,7 @@ PrimaryComponentTick.bCanEverTick = true;
 void USSCCameraComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
 
 	// Update protectedVariables to Default Camera Settings
 	UpdateCameraParameters(DefaultCameraParameters);
@@ -43,7 +52,10 @@ void USSCCameraComponent::BeginPlay()
 		ASSCGameMode* SSCGameMode = Cast<ASSCGameMode>(GameMode);
 		if (SSCGameMode != nullptr)
 		{
+			
 			SSCGameMode->UpdateCameraDelegate.AddDynamic(this, &USSCCameraComponent::UpdateCameraParameters);
+			//USSCBlueprintFunctionLibrary::GetSSCEventHandler()->TestDelegate.AddDynamic(this, &USSCameraComponent::UpdateCameraParameters);
+			//USSCBlueprintFunctionLibrary::GetSSCEventHandler();
 		}
 
 	}
@@ -96,7 +108,6 @@ void USSCCameraComponent::BeginPlay()
 			UE_LOG(SSCLog, Warning, TEXT("ManualCameraRotation is activated, but no RotateCameraXAxisMapping is set"));
 		}
 	}
-
 }
 
 
@@ -117,6 +128,11 @@ void USSCCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		{
 			UE_LOG(SSCLog, Warning, TEXT("MaualCameraRotation is set to true, but PlayerController is null"))
 		}
+	}
+
+	if (bAvoidObstacles)
+	{
+		AvoidObstacles();
 	}
 }
 
@@ -337,6 +353,31 @@ bool USSCCameraComponent::AreActorsMoving(FVector ActorsToFollowLocation)
 	ActorsToFollowLocationLastFrame = ActorsToFollowLocation;
 	
 	return bAreActorsToFollowMoving;
+}
+
+void USSCCameraComponent::AvoidObstacles()
+{	
+	// Disabled start of automated obstacle avoidance due to bad performance
+	/*
+	FHitResult HitLeft;
+	FHitResult HitRight;
+	FVector CollisionStart = GetOwner()->GetActorLocation();
+	FVector CollisionEnd = GetActorsLocation();
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(GetOwner());
+
+	const FName DebugTraceTag("DebugTraceTag");
+	GetWorld()->DebugDrawTraceTag = DebugTraceTag;
+	CollisionQueryParams.TraceTag = DebugTraceTag;
+
+
+	
+	// Left Trace
+	GetWorld()->SweepSingleByChannel(HitLeft, CollisionStart + GetOwner()->GetActorRightVector() * -300, CollisionEnd + GetOwner()->GetActorRightVector() * -300, FQuat::Identity, ECollisionChannel::ECC_Camera, FCollisionShape::MakeSphere(300), CollisionQueryParams);
+
+	// Right Trace
+	GetWorld()->SweepSingleByChannel(HitRight, CollisionStart + GetOwner()->GetActorRightVector() * 300, CollisionEnd + GetOwner()->GetActorRightVector() * 300, FQuat::Identity, ECollisionChannel::ECC_Camera, FCollisionShape::MakeSphere(300), CollisionQueryParams);
+	*/
 }
 
 // Manual Camera Movement

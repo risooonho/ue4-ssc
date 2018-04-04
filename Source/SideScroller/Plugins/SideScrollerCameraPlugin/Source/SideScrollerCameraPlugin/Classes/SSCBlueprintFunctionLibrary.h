@@ -104,6 +104,12 @@ struct FUpdateCameraParametersStruct
 
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "bCameraSplinePath"))
 	float SplineOverTimeTime;
+
+	UPROPERTY(EditAnywhere)
+	bool bUpdatesForAllPlayers = true;
+
+	//UPROPERTY(EditAnywhere, meta = (EditCondition = "!bUpdatesForAllPlayers"))
+	//TEnumAsByte<ESSCCameraID::SSCCameraID> CameraID;
 };
 
 UCLASS()
