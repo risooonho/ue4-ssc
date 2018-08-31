@@ -5,7 +5,7 @@ Note that this plugin is still in a very early stage and in heavy developement.
 
 FAQ: Why is nothing updated?
 
-Due to my work on two different projects, all my developing time is floating into these two things. But on the bright side, the camera was updated in the process a lot and as soon as i have time, at the latest at end if july, this plugin will be updated and a lot of buggy functions, more features and cleaner code will be pushed into this plugin.
+Due to my work on two different projects, all my developing time is floating into these two things. But on the bright side, the camera was updated in the process a lot and as soon as i have time, at the latest at end if ~july~ hopefully someday soon, this plugin will be updated and a lot of buggy functions, more features and cleaner code will be pushed into this plugin.
 
 Things in place:
 * Most of camera starting settings
