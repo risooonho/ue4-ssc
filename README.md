@@ -1,11 +1,13 @@
 ﻿# SideScroller Camera Plugin for UE4
 SideScroller Camera Plugin for Unreal Engine 4
 
-Note that this plugin is still in a very early stage and in heavy developement.
+Note that this plugin is still in a very early stage and in "heavy" (when I find the time) developement.
 
 FAQ: Why is nothing updated?
 
 Due to my work on two different projects, all my developing time is floating into these two things. But on the bright side, the camera was updated in the process a lot and as soon as i have time, ~at the latest at end of july~ hopefully someday soon, this plugin will be updated and a lot of buggy functions, more features and cleaner code will be pushed into this plugin.
+
+**Update:** Due to a lot of work i have abandoned this project for a long time, and I am sry. I will continue this Plugin next week with regularly weekly updates and a completly remodeled codebase.
 
 Things in place:
 * Most of camera starting settings
